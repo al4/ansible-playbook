@@ -20,15 +20,23 @@
       - python-gpgme  # for dropbox binary verification
       - terminator
       - tmux
-      - vim
+      - vim-nox
       - zsh
+  - name: remove apt packages
+    apt: name={{item}} state=absent
+    with_items:
+      - nano
 
   - name: editor
     alternatives:
       name: editor
-      path: /usr/bin/vim.basic
+      path: /usr/bin/vim.nox
+  - name: vim
+    alternatives:
+      name: vim
+      path: /usr/bin/vim.nox
   - name: set shell
-    user: 
+    user:
       name: "{{user}}"
       shell: /bin/zsh
 
@@ -44,10 +52,6 @@
       - PyQt5
       - powerline-status
       - tox
-  - name: install python2 packages
-    pip: name={{item}} executable=pip
-    with_items:
-      - powerline-status
 
   - name: dotfiles installation
     git:
