@@ -45,6 +45,11 @@
     with_items:
       - asciidoc
       - source-highlight
+  - name: qutebrowser link
+    copy:
+      src: files/qutebrowser/qutebrowser.desktop
+      dest: /usr/share/applications/qutebrowser.desktop
+
   - name: install python3 packages
     pip: name={{item}} executable=pip3
     with_items:

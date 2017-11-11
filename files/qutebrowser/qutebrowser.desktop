@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Qutebrowser
+Exec=/usr/local/bin/qutebrowser
+Icon=/usr/local/lib/python3.6/dist-packages/qutebrowser/html/doc/icon.png
+Type=Application
+Categories=Web;
