@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  tasks:
+  - name: update apt packages
+    apt:
+      update_cache: yes
+      upgrade: dist
+  - name: install apt packages
+    apt: name={{item}} state=installed
+    with_items:
+      - chromium-browser
+      - gnome-tweak-tool
+      - keepass2
+      - python3-pip
+      - python-gpgme  # for dropbox binary verification
+      - terminator
+      - tmux
+      - vim
+      - zsh
+  - name: editor
+    alternatives:
+      name: editor
+      path: /usr/bin/vim.basic
+  - name: qutebrowser dependencies
+    apt: name={{item}} state=installed
+    with_items:
+      - asciidoc
+      - source-highlight
+  - name: install python packages
+    pip: name={{item}} executable=pip3
+    with_items:
+      - qutebrowser
+      - PyQt5
+      - tox
