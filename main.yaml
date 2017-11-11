@@ -1,5 +1,9 @@
 ---
 - hosts: localhost
+
+  vars:
+    user: alex
+
   tasks:
   - name: update apt packages
     apt:
@@ -11,24 +15,101 @@
       - chromium-browser
       - gnome-tweak-tool
       - keepass2
+      - python-pip
       - python3-pip
       - python-gpgme  # for dropbox binary verification
       - terminator
       - tmux
       - vim
       - zsh
+
   - name: editor
     alternatives:
       name: editor
       path: /usr/bin/vim.basic
+  - name: set shell
+    user: 
+      name: "{{user}}"
+      shell: /bin/zsh
+
   - name: qutebrowser dependencies
     apt: name={{item}} state=installed
     with_items:
       - asciidoc
       - source-highlight
-  - name: install python packages
+  - name: install python3 packages
     pip: name={{item}} executable=pip3
     with_items:
       - qutebrowser
       - PyQt5
+      - powerline-status
       - tox
+  - name: install python2 packages
+    pip: name={{item}} executable=pip
+    with_items:
+      - powerline-status
+
+  - name: dotfiles installation
+    git:
+      repo: git@github.com:al4/dotfiles.git
+      dest: /home/{{user}}/src/al4/dotfiles
+    become: true
+    become_user: "{{user}}"
+  - name: dotfiles symlinks
+    file:
+      src: /home/{{user}}/src/al4/dotfiles/{{item}}
+      path: /home/{{user}}/{{item}}
+      state: link
+    with_items:
+      - .git-templates
+      - .zshrc
+
+  - name: vimrc installation
+    git:
+      repo: git@github.com:al4/dotvim.git
+      dest: /home/{{user}}/src/al4/dotvim
+    become: true
+    become_user: "{{user}}"
+  - name: dotvim symlink
+    file:
+      src: /home/{{user}}/src/al4/dotvim
+      path: /home/{{user}}/.vim
+      state: link
+  - name: vimrc symlink
+    file:
+      src: /home/{{user}}/src/al4/dotvim/.vimrc
+      path: /home/{{user}}/.vimrc
+      state: link
+
+  - name: ohmyzsh installation
+    git:
+      repo: git@github.com:robbyrussell/oh-my-zsh.git
+      dest: /home/{{user}}/.oh-my-zsh
+    become: true
+    become_user: "{{user}}"
+
+  - name: powerline fonts
+    git:
+      repo: git@github.com:powerline/fonts.git
+      dest: /home/{{user}}/src/public/fonts
+    become: true
+    become_user: "{{user}}"
+  - name: install powerline fonts
+    command: /bin/bash /home/{{user}}/src/public/fonts/install.sh
+    args:
+      creates: /home/{{user}}/.local/share/fonts/
+    become: true
+    become_user: "{{user}}"
+
+  - name: terminator solarized scheme
+    git:
+      repo: https://github.com/ghuntley/terminator-solarized.git
+      dest: /home/{{user}}/src/public/terminator-solarized
+
+  - name: terminator solarized scheme config
+    copy:
+      src: files/terminator/config
+      dest: /home/{{user}}/.config/terminator/config
+      force: no
+      owner: "{{user}}"
+
